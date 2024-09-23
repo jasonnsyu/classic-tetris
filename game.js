@@ -17,50 +17,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     ctx.globalAlpha = 1;
     ctx.fillStyle = "White";
-    ctx.font = "24px monospace";
+    ctx.font = "1vw monospace";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(param, canvas.width / 2, canvas.height / 2);
   };
   displayMessage("Press space to start!");
-
-  const tetrominoes = {
-    I: [[1, 1, 1, 1]],
-    J: [
-      [1, 1, 1],
-      [0, 0, 1],
-    ],
-    L: [
-      [1, 1, 1],
-      [1, 0, 0],
-    ],
-    O: [
-      [1, 1],
-      [1, 1],
-    ],
-    S: [
-      [0, 1, 1],
-      [1, 1, 0],
-    ],
-    T: [
-      [1, 1, 1],
-      [0, 1, 0],
-    ],
-    Z: [
-      [1, 1, 0],
-      [0, 1, 1],
-    ],
-  };
-
-  const colors = {
-    I: "cyan",
-    J: "blue",
-    L: "orange",
-    O: "yellow",
-    S: "green",
-    T: "purple",
-    Z: "red",
-  };
 
   const grid = canvas.width / 10;
   const rows = 20;
@@ -70,12 +32,20 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log(board);
 
   let isGameRunning = false;
+  let isGamePaused = false;
   let timerId;
+  let gameSpeed = 500;
+  let delay = gameSpeed * 0.4;
   let score = 0;
+  let lines = 0;
 
   window.addEventListener("keydown", (e) => {
     console.log(e.key);
-    if ((e.key === " " || e.code == "Space") && !isGameRunning) {
+    if (
+      (e.key === " " || e.code == "Space") &&
+      !isGameRunning &&
+      !isGamePaused
+    ) {
       isGameRunning = true;
 
       score = 0;
@@ -83,12 +53,14 @@ document.addEventListener("DOMContentLoaded", () => {
       newTetrimino();
       board.forEach((row) => row.fill(0));
 
-      timerId = setInterval(gameLoop, 500);
+      timerId = setInterval(gameLoop, gameSpeed);
     } else if ((e.key === "p" || e.code == "KeyP") && isGameRunning) {
       isGameRunning = false;
+      isGamePaused = true;
       displayMessage("Game Paused.");
     } else if ((e.key === "p" || e.code == "KeyP") && !isGameRunning) {
       isGameRunning = true;
+      isGamePaused = false;
     }
   });
 
@@ -154,8 +126,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  let isKeyEnabled = true;
+  let keysPressed = {};
+
   document.addEventListener("keydown", (e) => {
-    if (isGameRunning) {
+    if (isGameRunning && isKeyEnabled && !keysPressed[e.key]) {
+      keysPressed[e.key] = true; // Mark the key as pressed
+
       if (e.key === "ArrowLeft") {
         moveLeft();
       } else if (e.key === "ArrowRight") {
@@ -163,9 +140,18 @@ document.addEventListener("DOMContentLoaded", () => {
       } else if (e.key === "ArrowDown") {
         moveDown();
       } else if (e.key === "ArrowUp") {
-        rotateTetromino(); // TODO: Add Rotate left/right using Z and X
+        rotateTetromino();
       }
+
+      isKeyEnabled = false;
+      setTimeout(() => {
+        isKeyEnabled = true;
+      }, delay);
     }
+  });
+
+  document.addEventListener("keyup", (e) => {
+    keysPressed[e.key] = false;
   });
 
   function collisionDetection(tetromino, offSetX, offSetY) {
@@ -275,6 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
         board.splice(y, 1);
         board.unshift(Array(columns).fill(0));
         score += 100;
+        lines += 1;
         updateScore();
         y = rows;
       }
@@ -283,6 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateScore() {
     document.getElementById("score").textContent = score;
+    document.getElementById("lines").textContent = lines;
   }
 
   function drawGrid() {

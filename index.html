@@ -5,10 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Classic Tetris</title>
     <link rel="stylesheet" href="style.css" />
-    <script defer src="script.js" defer></script>
+    <script defer src="game.js" defer></script>
+    <script defer src="tetromino.js" defer></script>
   </head>
   <body>
-    <h1>Score <span id="score">0</span></h1>
     <canvas></canvas>
+    <settings-container>
+      <h1>Sand Tetris</h1>
+      <h3>Current Score: <span id="score">0</span></h3>
+      <h3>Lines Cleared: <span id="lines">0</span></h3>
+      <h3>Controls:</h3>
+      <span>Rotate - Arrow Up</span>
+      <span>Move Down - Arrow Down</span>
+      <span>Move Left - Arrow Left</span>
+      <span>Move Right - Arrow Right</span>
+      <span>New Game - Space</span>
+      <span>Pause Game - P</span>
+    </settings-container>
   </body>
 </html>

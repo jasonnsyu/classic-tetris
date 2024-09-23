@@ -12,11 +12,19 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
+  flex-direction: row;
+  font-size: 1vw;
 }
 
 canvas {
   background: #181825;
   width: calc(80vh * 0.5);
   height: 80vh;
+}
+
+settings-container {
+  padding: 2rem;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
 }
