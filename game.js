@@ -31,36 +31,59 @@ document.addEventListener("DOMContentLoaded", () => {
 
   console.log(board);
 
+  calcValue();
+
   let isGameRunning = false;
   let isGamePaused = false;
   let timerId;
   let gameSpeed = 500;
-  let delay = gameSpeed * 0.4;
+  let delay = gameSpeed * 0.2;
   let score = 0;
   let lines = 0;
 
+  document.addEventListener("updateGameSpeed", (event) => {
+    gameSpeed = event.detail.gameSpeed;
+    console.log(`Game speed updated to: ${gameSpeed}`);
+
+    if (isGameRunning) {
+      clearInterval(timerId);
+      timerId = setInterval(gameLoop, gameSpeed);
+    }
+  });
+
+  function gameLoop() {
+    if (isGameRunning) {
+      draw();
+      moveDown();
+    }
+  }
+
   window.addEventListener("keydown", (e) => {
     console.log(e.key);
-    if (
-      (e.key === " " || e.code == "Space") &&
-      !isGameRunning &&
-      !isGamePaused
-    ) {
-      isGameRunning = true;
 
-      score = 0;
-      updateScore();
-      newTetrimino();
-      board.forEach((row) => row.fill(0));
+    // Start new game or restart after Game Over
+    if (e.key === " " || e.code === "Space") {
+      if (!isGameRunning) {
+        // Reset game state
+        isGameRunning = true;
+        score = 0;
+        lines = 0;
+        updateScore();
+        newTetrimino();
+        board.forEach((row) => row.fill(0));
 
-      timerId = setInterval(gameLoop, gameSpeed);
-    } else if ((e.key === "p" || e.code == "KeyP") && isGameRunning) {
+        // Start game loop
+        timerId = setInterval(gameLoop, gameSpeed);
+        displayMessage("Game Started!");
+      }
+    } else if ((e.key === "p" || e.code === "KeyP") && isGameRunning) {
       isGameRunning = false;
       isGamePaused = true;
       displayMessage("Game Paused.");
-    } else if ((e.key === "p" || e.code == "KeyP") && !isGameRunning) {
+    } else if ((e.key === "p" || e.code === "KeyP") && !isGameRunning) {
       isGameRunning = true;
       isGamePaused = false;
+      displayMessage("Game Resumed.");
     }
   });
 
@@ -75,13 +98,6 @@ document.addEventListener("DOMContentLoaded", () => {
       type,
     };
     console.log(columns, currentTetromino);
-  }
-
-  function gameLoop() {
-    if (isGameRunning) {
-      draw();
-      moveDown();
-    }
   }
 
   function draw() {
@@ -130,23 +146,38 @@ document.addEventListener("DOMContentLoaded", () => {
   let keysPressed = {};
 
   document.addEventListener("keydown", (e) => {
-    if (isGameRunning && isKeyEnabled && !keysPressed[e.key]) {
+    if (isGameRunning && !keysPressed[e.key]) {
       keysPressed[e.key] = true; // Mark the key as pressed
 
-      if (e.key === "ArrowLeft") {
-        moveLeft();
-      } else if (e.key === "ArrowRight") {
-        moveRight();
-      } else if (e.key === "ArrowDown") {
-        moveDown();
-      } else if (e.key === "ArrowUp") {
-        rotateTetromino();
-      }
+      if (
+        e.key === "ArrowLeft" ||
+        e.key === "ArrowRight" ||
+        e.key === "ArrowDown"
+      ) {
+        if (isKeyEnabled) {
+          if (e.key === "ArrowLeft") {
+            moveLeft();
+          } else if (e.key === "ArrowRight") {
+            moveRight();
+          } else if (e.key === "ArrowDown") {
+            moveDown();
+          }
 
-      isKeyEnabled = false;
-      setTimeout(() => {
-        isKeyEnabled = true;
-      }, delay);
+          // Disable other keys temporarily after action
+          isKeyEnabled = false;
+          setTimeout(() => {
+            isKeyEnabled = true;
+          }, delay);
+        }
+      } else if (e.key === "z") {
+        // Rotation keys are "spammable" (no delay)
+        rotateTetrominoClockwise();
+        console.log("Rotated Clockwise");
+      } else if (e.key === "x") {
+        // Rotation keys are "spammable" (no delay)
+        rotateTetrominoCounterclockwise();
+        console.log("Rotated Counterclockwise");
+      }
     }
   });
 
@@ -224,14 +255,41 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function rotateMatrix(matrix) {
+  // Rotate matrix 90 degrees clockwise
+  function rotateMatrixClockwise(matrix) {
     return matrix[0].map((_, i) => matrix.map((row) => row[i]).reverse());
   }
 
-  function rotateTetromino() {
-    const tempShape = currentTetromino.shape;
-    currentTetromino.shape = rotateMatrix(tempShape);
+  // Rotate matrix 90 degrees counterclockwise
+  function rotateMatrixCounterclockwise(matrix) {
+    return matrix[0].map((_, i) =>
+      matrix.map((row) => row[row.length - 1 - i])
+    );
+  }
 
+  // Rotate the tetromino clockwise
+  function rotateTetrominoClockwise() {
+    const tempShape = currentTetromino.shape;
+    currentTetromino.shape = rotateMatrixClockwise(tempShape);
+
+    // Check for collision, and revert to previous shape if collision is detected
+    if (
+      collisionDetection(
+        currentTetromino.shape,
+        currentTetromino.x,
+        currentTetromino.y
+      )
+    ) {
+      currentTetromino.shape = tempShape;
+    }
+  }
+
+  // Rotate the tetromino counterclockwise
+  function rotateTetrominoCounterclockwise() {
+    const tempShape = currentTetromino.shape;
+    currentTetromino.shape = rotateMatrixCounterclockwise(tempShape);
+
+    // Check for collision, and revert to previous shape if collision is detected
     if (
       collisionDetection(
         currentTetromino.shape,

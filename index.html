@@ -3,17 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Classic Tetris</title>
+    <title>Sand Tetris</title>
     <link rel="stylesheet" href="style.css" />
     <script defer src="game.js" defer></script>
     <script defer src="tetromino.js" defer></script>
+    <script defer src="settings.js" defer></script>
   </head>
   <body>
     <canvas></canvas>
     <settings-container>
-      <h1>Sand Tetris</h1>
+      <h1>SAND TETRIS</h1>
       <h3>Current Score: <span id="score">0</span></h3>
       <h3>Lines Cleared: <span id="lines">0</span></h3>
+
+      <h3>Game Speed: <span class="value">0</span></h3>
+      <input type="range" class="slider" id="range" min="1" max="10" />
+
+      <!--
       <h3>Controls:</h3>
       <span>Rotate - Arrow Up</span>
       <span>Move Down - Arrow Down</span>
@@ -21,6 +27,7 @@
       <span>Move Right - Arrow Right</span>
       <span>New Game - Space</span>
       <span>Pause Game - P</span>
+      -->
     </settings-container>
   </body>
 </html>
