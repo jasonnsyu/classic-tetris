@@ -3,7 +3,7 @@ let value = document.querySelector(".value");
 value.innerHTML = slider.value;
 
 function calcValue() {
-  valuePercentage = (slider.value / slider.max) * 100;
+  valuePercentage = (slider.value / slider.max) * 100 - 1;
   slider.style.background = `linear-gradient(to right, #0A84FF ${valuePercentage}%, #ebe9e7 ${valuePercentage}%)`;
 }
 

@@ -11,23 +11,28 @@
   </head>
   <body>
     <canvas></canvas>
-    <settings-container>
+    <div id="settings-container">
       <h1>SAND TETRIS</h1>
+      <!--
+      Next piece:
+      Time elapsed:
+      -->
       <h3>Current Score: <span id="score">0</span></h3>
       <h3>Lines Cleared: <span id="lines">0</span></h3>
 
       <h3>Game Speed: <span class="value">0</span></h3>
       <input type="range" class="slider" id="range" min="1" max="10" />
 
-      <!--
-      <h3>Controls:</h3>
-      <span>Rotate - Arrow Up</span>
-      <span>Move Down - Arrow Down</span>
-      <span>Move Left - Arrow Left</span>
-      <span>Move Right - Arrow Right</span>
-      <span>New Game - Space</span>
-      <span>Pause Game - P</span>
-      -->
-    </settings-container>
+      <div id="controls-container">
+        <h3>Controls:</h3>
+        <span>Rotate Clockwise - Z</span>
+        <span>Rotate Counter Clockwise - X</span>
+        <span>Move Down - Arrow Down</span>
+        <span>Move Left - Arrow Left</span>
+        <span>Move Right - Arrow Right</span>
+        <span>New Game - Space</span>
+        <span>Pause Game - P</span>
+      </div>
+    </div>
   </body>
 </html>
